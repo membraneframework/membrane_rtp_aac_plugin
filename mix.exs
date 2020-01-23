@@ -6,7 +6,7 @@ defmodule Membrane.Element.RTP.AAC.MixProject do
 
   def project do
     [
-      app: $,
+      app: :membrane_element_rtp_aac,
       version: @version,
       elixir: "~> 1.7",
       elixirc_paths: elixirc_paths(Mix.env()),
