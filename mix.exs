@@ -10,9 +10,9 @@ defmodule Membrane.Element.RTP.AAC.MixProject do
       version: @version,
       elixir: "~> 1.7",
       elixirc_paths: elixirc_paths(Mix.env()),
-      description: "Membrane Multimedia Framework (Element)" $,
+      description: "Membrane Multimedia Framework (Element)",
       package: package(),
-      name: "Membrane Element:" $,
+      name: "Membrane Element: RTP AAC",
       source_url: @github_url,
       docs: docs(),
       deps: deps()
@@ -33,7 +33,7 @@ defmodule Membrane.Element.RTP.AAC.MixProject do
       main: "readme",
       extras: ["README.md"],
       source_ref: "v#{@version}",
-      nest_modules_by_prefix: [Membrane.Element $]
+      nest_modules_by_prefix: [Membrane.Element]
     ]
   end
 
