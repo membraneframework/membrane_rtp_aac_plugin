@@ -35,7 +35,7 @@ defmodule Membrane.Element.RTP.AAC.Depayloader do
   @impl true
   def handle_process(:input, buffer, _ctx, state) do
     with {:ok, payload} <- parse_packet(buffer.payload) do
-      {{:ok, buffer: {:output, %Buffer{payload: payload}}}, state}
+      {{:ok, buffer: {:output, %Buffer{buffer | payload: payload}}}, state}
     else
       {:error, reason} -> {{:error, reason}, state}
     end
