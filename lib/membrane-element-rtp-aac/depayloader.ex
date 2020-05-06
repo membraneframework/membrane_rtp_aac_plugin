@@ -1,10 +1,10 @@
 defmodule Membrane.Element.RTP.AAC.Depayloader do
   use Membrane.Filter
   alias Membrane.Buffer
-  alias Membrane.Caps.AAC
+  alias Membrane.Caps.Audio.AAC
 
   def_input_pad :input, demand_unit: :buffers, caps: :any
-  def_output_pad :output, caps: {AAC, packetization: :raw}
+  def_output_pad :output, caps: {AAC, encapsulation: :raw}
 
   def_options profile: [
                 default: :LC
