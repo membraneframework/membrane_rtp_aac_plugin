@@ -51,7 +51,7 @@ defmodule Membrane.Element.RTP.AAC.MixProject do
   defp deps do
     [
       {:membrane_core, "~> 0.5.0"},
-      {:membrane_caps_audio_aac, github: "membraneframework/membrane-caps-audio-aac"},
+      {:membrane_aac_format, "~> 0.1.0"},
       {:ex_doc, "~> 0.21", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0.0-rc.7", only: [:dev, :test], runtime: false}
     ]
