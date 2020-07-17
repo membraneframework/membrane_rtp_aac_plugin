@@ -1,4 +1,4 @@
-defmodule Membrane.Element.RTP.AAC.Depayloader do
+defmodule Membrane.RTP.AAC.Depayloader do
   use Membrane.Filter
   alias Membrane.Buffer
   alias Membrane.AAC
