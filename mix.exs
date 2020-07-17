@@ -1,18 +1,18 @@
-defmodule Membrane.Element.RTP.AAC.MixProject do
+defmodule Membrane.RTP.AAC.MixProject do
   use Mix.Project
 
-  @version "0.1.0"
-  @github_url "https://github.com/membraneframework/membrane-element-rtp-aac"
+  @version "0.1.0-alpha"
+  @github_url "https://github.com/membraneframework/membrane_rtp_aac_plugin"
 
   def project do
     [
-      app: :membrane_element_rtp_aac,
+      app: :membrane_rtp_aac_plugin,
       version: @version,
-      elixir: "~> 1.7",
+      elixir: "~> 1.9",
       elixirc_paths: elixirc_paths(Mix.env()),
-      description: "Membrane Multimedia Framework (Element)",
+      description: "Membrane Multimedia Framework (RTP AAC Plugin)",
       package: package(),
-      name: "Membrane Element: RTP AAC",
+      name: "Membrane Plugin: RTP AAC",
       source_url: @github_url,
       docs: docs(),
       deps: deps()
@@ -33,7 +33,7 @@ defmodule Membrane.Element.RTP.AAC.MixProject do
       main: "readme",
       extras: ["README.md"],
       source_ref: "v#{@version}",
-      nest_modules_by_prefix: [Membrane.Element]
+      nest_modules_by_prefix: [Membrane.RTP.AAC]
     ]
   end
 
@@ -50,10 +50,10 @@ defmodule Membrane.Element.RTP.AAC.MixProject do
 
   defp deps do
     [
-      {:membrane_core, "~> 0.5.0"},
+      {:membrane_core, "~> 0.5.1"},
       {:membrane_aac_format, "~> 0.1.0"},
       {:ex_doc, "~> 0.21", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.0.0-rc.7", only: [:dev, :test], runtime: false}
+      {:dialyxir, "~> 1.0", only: :dev, runtime: false},
     ]
   end
 end
