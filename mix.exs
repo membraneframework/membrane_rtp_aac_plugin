@@ -1,7 +1,7 @@
 defmodule Membrane.RTP.AAC.MixProject do
   use Mix.Project
 
-  @version "0.1.0"
+  @version "0.1.0-alpha"
   @github_url "https://github.com/membraneframework/membrane_rtp_aac_plugin"
 
   def project do
@@ -33,7 +33,7 @@ defmodule Membrane.RTP.AAC.MixProject do
       main: "readme",
       extras: ["README.md"],
       source_ref: "v#{@version}",
-      nest_modules_by_prefix: [Membrane.Element]
+      nest_modules_by_prefix: [Membrane.RTP.AAC]
     ]
   end
 
