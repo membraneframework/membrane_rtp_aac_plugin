@@ -53,7 +53,7 @@ defmodule Membrane.RTP.AAC.MixProject do
       {:membrane_core, "~> 0.5.1"},
       {:membrane_aac_format, "~> 0.1.0"},
       {:ex_doc, "~> 0.21", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.0", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.0", only: :dev, runtime: false}
     ]
   end
 end
