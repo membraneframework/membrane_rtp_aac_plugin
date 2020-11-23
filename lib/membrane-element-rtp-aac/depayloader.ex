@@ -7,8 +7,8 @@ defmodule Membrane.RTP.AAC.Depayloader do
   def_output_pad :output, caps: {RemoteStream, content_format: AAC, type: :packetized}
 
   @impl true
-  def handle_init(options) do
-    {:ok, options |> Map.merge(%{leftover: <<>>})}
+  def handle_init(_options) do
+    {:ok, %{}}
   end
 
   @impl true
