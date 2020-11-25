@@ -1,24 +1,14 @@
 defmodule Membrane.RTP.AAC.Depayloader do
   use Membrane.Filter
   alias Membrane.Buffer
-  alias Membrane.AAC
+  alias Membrane.{AAC, RemoteStream, RTP}
 
-  def_input_pad :input, demand_unit: :buffers, caps: :any
-  def_output_pad :output, caps: {AAC, encapsulation: :none}
-
-  def_options profile: [
-                default: :LC
-              ],
-              sample_rate: [
-                default: 44100
-              ],
-              channels: [
-                default: 2
-              ]
+  def_input_pad :input, demand_unit: :buffers, caps: RTP
+  def_output_pad :output, caps: {RemoteStream, content_format: AAC, type: :packetized}
 
   @impl true
-  def handle_init(options) do
-    {:ok, options |> Map.merge(%{leftover: <<>>})}
+  def handle_init(_options) do
+    {:ok, %{}}
   end
 
   @impl true
@@ -27,8 +17,8 @@ defmodule Membrane.RTP.AAC.Depayloader do
   end
 
   @impl true
-  def handle_prepared_to_playing(_ctx, state) do
-    caps = %AAC{profile: state.profile, sample_rate: state.sample_rate, channels: state.channels}
+  def handle_caps(:input, _caps, _ctx, state) do
+    caps = %RemoteStream{content_format: AAC, type: :packetized}
     {{:ok, caps: {:output, caps}}, state}
   end
 
