@@ -1,7 +1,7 @@
 defmodule Membrane.RTP.AAC.MixProject do
   use Mix.Project
 
-  @version "0.1.0-alpha"
+  @version "0.2.0-alpha"
   @github_url "https://github.com/membraneframework/membrane_rtp_aac_plugin"
 
   def project do
@@ -50,8 +50,8 @@ defmodule Membrane.RTP.AAC.MixProject do
 
   defp deps do
     [
-      {:membrane_core, "~> 0.5.1"},
-      {:membrane_aac_format, "~> 0.1.0"},
+      {:membrane_core, "~> 0.6.0"},
+      {:membrane_aac_format, "~> 0.2.0"},
       {:membrane_remote_stream_format, "~> 0.1.0"},
       {:membrane_rtp_format, "~> 0.3.0"},
       {:ex_doc, "~> 0.21", only: [:dev, :test], runtime: false},
