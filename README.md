@@ -12,7 +12,7 @@ It is part of [Membrane Multimedia Framework](https://membraneframework.org).
 Add the following line to your `deps` in `mix.exs`. Run `mix deps.get`.
 
 ```elixir
-{:membrane_rtp_aac_plugin, "~> 0.1.0-alpha"}
+{:membrane_rtp_aac_plugin, "~> 0.3.0-alpha"}
 ```
 
 The docs can be found at [HexDocs](https://hexdocs.pm/membrane_rtp_aac_plugin).
