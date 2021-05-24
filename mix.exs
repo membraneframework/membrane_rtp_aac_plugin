@@ -21,7 +21,8 @@ defmodule Membrane.RTP.AAC.MixProject do
 
   def application do
     [
-      extra_applications: []
+      extra_applications: [],
+      mod: {Membrane.RTP.AAC.Plugin.App, []}
     ]
   end
 
