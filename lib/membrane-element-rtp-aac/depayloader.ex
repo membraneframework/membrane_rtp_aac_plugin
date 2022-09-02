@@ -1,4 +1,6 @@
 defmodule Membrane.RTP.AAC.Depayloader do
+  @moduledoc false
+
   use Membrane.Filter
   alias Membrane.Buffer
   alias Membrane.{AAC, RTP}
@@ -10,7 +12,7 @@ defmodule Membrane.RTP.AAC.Depayloader do
                 default: :LC
               ],
               sample_rate: [
-                default: 44100
+                default: 44_100
               ],
               channels: [
                 default: 2
@@ -48,7 +50,7 @@ defmodule Membrane.RTP.AAC.Depayloader do
            packet do
       {:ok, au}
     else
-      _ -> {:error, :invalid_packet}
+      _else -> {:error, :invalid_packet}
     end
   end
 end

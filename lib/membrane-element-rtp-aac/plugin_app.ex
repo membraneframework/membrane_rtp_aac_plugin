@@ -3,6 +3,7 @@ defmodule Membrane.RTP.AAC.Plugin.App do
   use Application
   alias Membrane.RTP.{AAC, PayloadFormat}
 
+  @spec start(any, any) :: {:error, any} | {:ok, pid}
   def start(_type, _args) do
     PayloadFormat.register(%PayloadFormat{
       encoding_name: :AAC,
