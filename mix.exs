@@ -1,4 +1,4 @@
-defmodule Membrane.RTP.AAC.MixProject do
+defmodule Membrane.Template.Mixfile do
   use Mix.Project
 
   @version "0.5.0"
@@ -8,14 +8,21 @@ defmodule Membrane.RTP.AAC.MixProject do
     [
       app: :membrane_rtp_aac_plugin,
       version: @version,
-      elixir: "~> 1.9",
+      elixir: "~> 1.12",
       elixirc_paths: elixirc_paths(Mix.env()),
-      description: "Membrane Multimedia Framework (RTP AAC Plugin)",
+      start_permanent: Mix.env() == :prod,
+      deps: deps(),
+      dialyzer: dialyzer(),
+
+      # hex
+      description: "RTP ACC Plugin for Membrane Multimedia Framework",
       package: package(),
-      name: "Membrane Plugin: RTP AAC",
+
+      # docs
+      name: "Membrane RTP AAC Plugin",
       source_url: @github_url,
-      docs: docs(),
-      deps: deps()
+      homepage_url: "https://membrane.stream",
+      docs: docs()
     ]
   end
 
@@ -27,15 +34,30 @@ defmodule Membrane.RTP.AAC.MixProject do
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_), do: ["lib"]
+  defp elixirc_paths(_env), do: ["lib"]
 
-  defp docs do
+  defp deps do
     [
-      main: "readme",
-      extras: ["README.md"],
-      source_ref: "v#{@version}",
-      nest_modules_by_prefix: [Membrane.RTP.AAC]
+      {:membrane_core, "~> 0.10.0"},
+      {:membrane_aac_format, "~> 0.7.0"},
+      {:membrane_rtp_format, "~> 0.5.0"},
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:dialyxir, ">= 0.0.0", only: :dev, runtime: false},
+      {:credo, ">= 0.0.0", only: :dev, runtime: false}
     ]
+  end
+
+  defp dialyzer() do
+    opts = [
+      flags: [:error_handling]
+    ]
+
+    if System.get_env("CI") == "true" do
+      # Store PLTs in cacheable directory for CI
+      [plt_local_path: "priv/plts", plt_core_path: "priv/plts"] ++ opts
+    else
+      opts
+    end
   end
 
   defp package do
@@ -44,18 +66,18 @@ defmodule Membrane.RTP.AAC.MixProject do
       licenses: ["Apache 2.0"],
       links: %{
         "GitHub" => @github_url,
-        "Membrane Framework Homepage" => "https://membraneframework.org"
+        "Membrane Framework Homepage" => "https://membrane.stream"
       }
     ]
   end
 
-  defp deps do
+  defp docs do
     [
-      {:membrane_core, "~> 0.8.0"},
-      {:membrane_aac_format, "~> 0.5.0"},
-      {:membrane_rtp_format, "~> 0.3.0"},
-      {:ex_doc, "~> 0.21", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.0", only: :dev, runtime: false}
+      main: "readme",
+      extras: ["README.md", "LICENSE"],
+      formatters: ["html"],
+      source_ref: "v#{@version}",
+      nest_modules_by_prefix: [Membrane.RTP.AAC]
     ]
   end
 end
