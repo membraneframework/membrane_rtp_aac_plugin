@@ -5,7 +5,7 @@ defmodule Membrane.RTP.AAC.Depayloader do
   alias Membrane.Buffer
   alias Membrane.{AAC, RTP}
 
-  def_input_pad :input, demand_unit: :buffers, accepted_format: %RTP{}
+  def_input_pad :input, accepted_format: %RTP{}
   def_output_pad :output, accepted_format: %AAC{encapsulation: :none}
 
   def_options profile: [
@@ -20,7 +20,12 @@ defmodule Membrane.RTP.AAC.Depayloader do
 
   @impl true
   def handle_init(_ctx, options) do
-    {[], Map.merge(options, %{leftover: <<>>})}
+    state =
+      options
+      |> Map.from_struct()
+      |> Map.put(:leftover, <<>>)
+
+    {[], state}
   end
 
   @impl true
@@ -35,7 +40,7 @@ defmodule Membrane.RTP.AAC.Depayloader do
   end
 
   @impl true
-  def handle_process(:input, buffer, _ctx, state) do
+  def handle_buffer(:input, buffer, _ctx, state) do
     with {:ok, payload} <- parse_packet(buffer.payload) do
       {[buffer: {:output, %Buffer{buffer | payload: payload}}], state}
     else

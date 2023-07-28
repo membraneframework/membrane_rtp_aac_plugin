@@ -38,7 +38,7 @@ defmodule Membrane.Template.Mixfile do
 
   defp deps do
     [
-      {:membrane_core, "~> 0.12.0"},
+      {:membrane_core, "~> 0.12.7"},
       {:membrane_aac_format, "~> 0.7.0"},
       {:membrane_rtp_format, "~> 0.7.0"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
