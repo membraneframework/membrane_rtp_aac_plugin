@@ -5,8 +5,8 @@ defmodule Membrane.RTP.AAC.Depayloader do
   alias Membrane.Buffer
   alias Membrane.{AAC, RTP}
 
-  def_input_pad :input, demand_unit: :buffers, caps: RTP
-  def_output_pad :output, caps: {AAC, encapsulation: :none}
+  def_input_pad :input, accepted_format: %RTP{}
+  def_output_pad :output, accepted_format: %AAC{encapsulation: :none}
 
   def_options profile: [
                 default: :LC
@@ -19,27 +19,32 @@ defmodule Membrane.RTP.AAC.Depayloader do
               ]
 
   @impl true
-  def handle_init(options) do
-    {:ok, Map.merge(options, %{leftover: <<>>})}
+  def handle_init(_ctx, options) do
+    state =
+      options
+      |> Map.from_struct()
+      |> Map.put(:leftover, <<>>)
+
+    {[], state}
   end
 
   @impl true
-  def handle_caps(:input, _caps, _ctx, state) do
+  def handle_stream_format(:input, _caps, _ctx, state) do
     caps = %AAC{profile: state.profile, sample_rate: state.sample_rate, channels: state.channels}
-    {{:ok, caps: {:output, caps}}, state}
+    {[stream_format: {:output, caps}], state}
   end
 
   @impl true
   def handle_demand(:output, size, :buffers, _ctx, state) do
-    {{:ok, demand: {:input, size}}, state}
+    {[demand: {:input, size}], state}
   end
 
   @impl true
-  def handle_process(:input, buffer, _ctx, state) do
+  def handle_buffer(:input, buffer, _ctx, state) do
     with {:ok, payload} <- parse_packet(buffer.payload) do
-      {{:ok, buffer: {:output, %Buffer{buffer | payload: payload}}}, state}
+      {[buffer: {:output, %Buffer{buffer | payload: payload}}], state}
     else
-      {:error, reason} -> {{:error, reason}, state}
+      {:error, reason} -> raise "Cannot parse packet due to: #{inspect(reason)}"
     end
   end
 
