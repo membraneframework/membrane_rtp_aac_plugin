@@ -1,5 +1,5 @@
 defmodule Membrane.RTP.AAC.Depayloader do
-  @moduledoc false
+  @moduledoc "TODO"
 
   use Membrane.Filter
   alias Membrane.Buffer
@@ -29,9 +29,14 @@ defmodule Membrane.RTP.AAC.Depayloader do
   end
 
   @impl true
-  def handle_stream_format(:input, _caps, _ctx, state) do
-    caps = %AAC{profile: state.profile, sample_rate: state.sample_rate, channels: state.channels}
-    {[stream_format: {:output, caps}], state}
+  def handle_stream_format(:input, _stream_fmt, _ctx, state) do
+    stream_fmt = %AAC{
+      profile: state.profile,
+      sample_rate: state.sample_rate,
+      channels: state.channels
+    }
+
+    {[stream_format: {:output, stream_fmt}], state}
   end
 
   @impl true
@@ -51,8 +56,7 @@ defmodule Membrane.RTP.AAC.Depayloader do
   defp parse_packet(packet) do
     headers_length = 16
 
-    with <<^headers_length::16, au_size::13, _au_index::3, au::binary-size(au_size)>> <-
-           packet do
+    with <<^headers_length::16, au_size::13, _au_index::3, au::binary-size(au_size)>> <- packet do
       {:ok, au}
     else
       _else -> {:error, :invalid_packet}
