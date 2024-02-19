@@ -6,7 +6,7 @@ defmodule Membrane.RTP.AAC.Pipeline.Test do
 
   defp prepare_test_payload(_ctx) do
     %{
-      payload: [<<1::8>>]
+      payload: [<<1>>]
     }
   end
 

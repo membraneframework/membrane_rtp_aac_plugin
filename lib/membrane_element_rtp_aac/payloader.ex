@@ -5,6 +5,7 @@ defmodule Membrane.RTP.AAC.Payloader do
 
   alias Membrane.Buffer
   alias Membrane.{AAC, RTP}
+  alias Membrane.RTP.AAC.Utils
 
   def_input_pad :input, accepted_format: %AAC{encapsulation: :none}
   def_output_pad :output, accepted_format: %RTP{}
@@ -50,32 +51,7 @@ defmodule Membrane.RTP.AAC.Payloader do
 
   @spec wrap_aac([binary()], map()) :: binary()
   defp wrap_aac(aus, state) do
-    au_lenghts = aus |> Enum.map(&byte_size/1)
-    make_headers(au_lenghts, state.bitrate) <> :binary.list_to_bin(aus)
+    au_sizes = aus |> Enum.map(&byte_size/1)
+    Utils.make_headers(au_sizes, state.bitrate) <> :binary.list_to_bin(aus)
   end
-
-  @spec make_headers([pos_integer()], :lbr | :hbr) :: binary()
-  defp make_headers(lengths, bitrate) do
-    aus_count = length(lengths)
-    {au_size_length, au_index_length} = bitrate_params(bitrate)
-    header_length = au_size_length + au_index_length
-
-    headers_length =
-      aus_count * header_length
-
-    deltas = List.duplicate(1, header_length - 1)
-
-    headers =
-      for {au_size, au_index} <- Enum.zip([lengths, [0 | deltas]]) do
-        <<au_size::size(au_size_length), au_index::size(au_index_length)>>
-      end
-      |> :binary.list_to_bin()
-
-    <<headers_length::16>> <> headers
-  end
-
-  @spec bitrate_params(:lbr | :hbr) ::
-          {au_size_length :: pos_integer(), au_index_length :: pos_integer()}
-  defp bitrate_params(:lbr), do: {6, 2}
-  defp bitrate_params(:hbr), do: {13, 3}
 end
