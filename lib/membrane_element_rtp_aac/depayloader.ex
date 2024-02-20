@@ -1,5 +1,5 @@
 defmodule Membrane.RTP.AAC.Depayloader do
-  @moduledoc "TODO"
+  @moduledoc "TODO, IETF RFC3640 compliant"
 
   use Membrane.Filter
   alias Membrane.Buffer
@@ -19,7 +19,8 @@ defmodule Membrane.RTP.AAC.Depayloader do
                 default: 2
               ],
               mode: [
-                spec: :lbr | :hbr
+                # __jm__ idk if this is recognised correctly, can't 'goto' definition
+                spec: Utils.mode()
               ]
 
   @impl true

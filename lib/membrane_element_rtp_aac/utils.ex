@@ -1,6 +1,6 @@
 defmodule Membrane.RTP.AAC.Utils do
   use Bunch
-  @moduledoc "TODO"
+  @moduledoc "__jm__"
 
   @type mode() :: :lbr | :hbr
 
@@ -13,8 +13,8 @@ defmodule Membrane.RTP.AAC.Utils do
     headers_length =
       aus_count * header_length
 
-    deltas = List.duplicate(1, header_length - 1)
-    au_index_deltas = [0 | deltas]
+    # __jm__ support interleaving?
+    au_index_deltas = List.duplicate(0, aus_count)
 
     headers =
       Enum.zip_with(sizes, au_index_deltas, fn au_size, au_index ->
@@ -33,6 +33,7 @@ defmodule Membrane.RTP.AAC.Utils do
     {au_size_length, au_index_length} = bitrate_params(mode)
 
     # @type headers :: [{integer(), integer()}]
+    # __jm__ are inline type hints possible?
     headers =
       for <<au_size::size(au_size_length), au_index::size(au_index_length) <- header_section>>,
         do: {au_size, au_index}
@@ -51,7 +52,6 @@ defmodule Membrane.RTP.AAC.Utils do
 
   @spec parse_data_section([pos_integer()], binary()) :: {:ok, [binary()]} | {:error, any()}
   defp parse_data_section(au_sizes, au_data_section) do
-    # how does this fail?
     result =
       Bunch.Enum.try_map_reduce(au_sizes, au_data_section, fn len, data ->
         case data do
@@ -62,24 +62,24 @@ defmodule Membrane.RTP.AAC.Utils do
 
     case result do
       {{:ok, aus}, <<>>} -> {:ok, aus}
+      # __jm__ is left more typical?
       {{:error, reason}, data} -> {:error, {reason, data}}
+      # __jm__ like what?
       _else -> raise "Unexpected scenario"
     end
   end
 
   @spec validate_deltas([integer()]) :: boolean()
-  defp validate_deltas(au_indices) do
-    len = length(au_indices) - 1
-    [0 | List.duplicate(1, len)] == au_indices
-  end
+  defp validate_deltas(au_indices),
+    do: au_indices == List.duplicate(0, length(au_indices))
 
   @spec validate_sizes([pos_integer()], binary()) :: boolean()
   defp validate_sizes(au_sizes, au_data_section),
+    # __jm__ support interleaving?
     do: Enum.sum(au_sizes) == byte_size(au_data_section)
 
   @spec bitrate_params(mode()) ::
           {au_size_length :: pos_integer(), au_index_length :: pos_integer()}
   defp bitrate_params(:lbr), do: {6, 2}
   defp bitrate_params(:hbr), do: {13, 3}
-  defp bitrate_params(_), do: {6, 2}
 end

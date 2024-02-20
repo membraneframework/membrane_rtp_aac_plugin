@@ -1,5 +1,5 @@
 defmodule Membrane.RTP.AAC.Payloader do
-  @moduledoc "TODO"
+  @moduledoc "TODO, IETF RFC3640 compliant"
 
   use Membrane.Filter
 
@@ -11,7 +11,7 @@ defmodule Membrane.RTP.AAC.Payloader do
   def_output_pad :output, accepted_format: %RTP{}
 
   def_options mode: [
-                spec: :lbr | :hbr
+                spec: Utils.mode()
               ],
               frames_per_packet: [
                 spec: pos_integer()
@@ -33,15 +33,11 @@ defmodule Membrane.RTP.AAC.Payloader do
   end
 
   @impl true
-  def handle_demand(:output, size, :buffers, _ctx, state) do
-    {[demand: {:input, size}], state}
-  end
-
-  @impl true
   def handle_buffer(:input, buffer, _ctx, state) do
     acc = [buffer.payload | state.acc]
 
     if length(acc) == state.frames_per_packet do
+      acc = Enum.reverse(acc)
       {[buffer: {:output, %Buffer{buffer | payload: wrap_aac(acc, state)}}], %{state | acc: []}}
     else
       {[], %{state | acc: acc}}
