@@ -10,7 +10,7 @@ defmodule Membrane.RTP.AAC.Payloader do
   def_input_pad :input, accepted_format: %AAC{encapsulation: :none}
   def_output_pad :output, accepted_format: %RTP{}
 
-  def_options bitrate: [
+  def_options mode: [
                 spec: :lbr | :hbr
               ],
               frames_per_packet: [
@@ -39,7 +39,6 @@ defmodule Membrane.RTP.AAC.Payloader do
 
   @impl true
   def handle_buffer(:input, buffer, _ctx, state) do
-    @type buffer.payload :: binary()
     acc = [buffer.payload | state.acc]
 
     if length(acc) == state.frames_per_packet do
@@ -52,6 +51,6 @@ defmodule Membrane.RTP.AAC.Payloader do
   @spec wrap_aac([binary()], map()) :: binary()
   defp wrap_aac(aus, state) do
     au_sizes = aus |> Enum.map(&byte_size/1)
-    Utils.make_headers(au_sizes, state.bitrate) <> :binary.list_to_bin(aus)
+    Utils.make_headers(au_sizes, state.mode) <> :binary.list_to_bin(aus)
   end
 end

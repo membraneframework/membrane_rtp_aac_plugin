@@ -32,7 +32,7 @@ defmodule Membrane.RTP.AAC.Utils do
 
     {au_size_length, au_index_length} = bitrate_params(mode)
 
-    @type headers :: [{integer(), integer()}]
+    # @type headers :: [{integer(), integer()}]
     headers =
       for <<au_size::size(au_size_length), au_index::size(au_index_length) <- header_section>>,
         do: {au_size, au_index}
@@ -81,4 +81,5 @@ defmodule Membrane.RTP.AAC.Utils do
           {au_size_length :: pos_integer(), au_index_length :: pos_integer()}
   defp bitrate_params(:lbr), do: {6, 2}
   defp bitrate_params(:hbr), do: {13, 3}
+  defp bitrate_params(_), do: {6, 2}
 end
