@@ -1,6 +1,6 @@
 defmodule Membrane.RTP.AAC.Utils do
-  use Bunch
   @moduledoc "__jm__"
+  use Bunch
 
   @type mode() :: :lbr | :hbr
 

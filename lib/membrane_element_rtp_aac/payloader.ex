@@ -34,6 +34,7 @@ defmodule Membrane.RTP.AAC.Payloader do
 
   @impl true
   def handle_buffer(:input, buffer, _ctx, state) do
+    # __jm__ check whether au size is in accordance with bitrate mode
     acc = [buffer.payload | state.acc]
 
     if length(acc) == state.frames_per_packet do
