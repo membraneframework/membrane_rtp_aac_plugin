@@ -24,7 +24,7 @@ defmodule Membrane.RTP.AAC.Payloader do
       |> Map.from_struct()
       |> Map.put(:acc, [])
 
-    {_actions = [], state}
+    {[], state}
   end
 
   @impl true

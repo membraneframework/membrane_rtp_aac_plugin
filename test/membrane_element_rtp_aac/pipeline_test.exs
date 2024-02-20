@@ -20,7 +20,7 @@ defmodule Membrane.RTP.AAC.Pipeline.Test do
       |> child(:sink, Membrane.Testing.Sink)
     ]
 
-    {:ok, _supervisor_pid, pipeline_pid} = Membrane.Testing.Pipeline.start(spec: spec)
+    pipeline_pid = Membrane.Testing.Pipeline.start_link_supervised!(spec: spec)
 
     assert_start_of_stream(pipeline_pid, :sink)
 
