@@ -13,7 +13,10 @@ defmodule Membrane.RTP.AAC.Pipeline.Test do
           output: payload,
           stream_format: %Membrane.AAC{}
         })
-        |> child(:payloader, %Membrane.RTP.AAC.Payloader{mode: mode, frames_per_packet: frames_per_packet})
+        |> child(:payloader, %Membrane.RTP.AAC.Payloader{
+          mode: mode,
+          frames_per_packet: frames_per_packet
+        })
         |> child(:depayloader, %Membrane.RTP.AAC.Depayloader{mode: mode})
         |> child(:sink, Membrane.Testing.Sink)
       ]
@@ -34,11 +37,13 @@ defmodule Membrane.RTP.AAC.Pipeline.Test do
 
     test "when sending single packet, low bitrate mode",
       do: run_pipeline_test(1, :lbr, [<<1>>])
+
     test "when sending single packet, high bitrate mode",
       do: run_pipeline_test(1, :hbr, [<<1>>])
 
     test "when sending single packet, multiple frames, low bitrate mode",
       do: run_pipeline_test(2, :lbr, [<<1>>, <<2>>])
+
     test "when sending single packet, multiple frames, high bitrate mode",
       do: run_pipeline_test(2, :hbr, [<<1>>, <<2>>])
 
