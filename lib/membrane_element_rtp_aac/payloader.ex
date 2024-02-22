@@ -34,14 +34,18 @@ defmodule Membrane.RTP.AAC.Payloader do
 
   @impl true
   def handle_buffer(:input, buffer, _ctx, state) do
-    # __jm__ check whether au size is in accordance with bitrate mode
-    acc = [buffer.payload | state.acc]
+    use Bunch
 
-    if length(acc) == state.frames_per_packet do
-      acc = Enum.reverse(acc)
-      {[buffer: {:output, %Buffer{buffer | payload: wrap_aac(acc, state)}}], %{state | acc: []}}
+    Bunch.withl do: au = buffer.payload,
+                validate_size: true <- Utils.validate_max_au_size(state.mode, au),
+                do: acc = [au | state.acc],
+                packet_ready?: true <- length(acc) == state.frames_per_packet,
+                do: acc = acc |> Enum.reverse(),
+                do: new_buffer = %Buffer{buffer | payload: wrap_aac(acc, state)} do
+      {[buffer: {:output, new_buffer}], %{state | acc: []}}
     else
-      {[], %{state | acc: acc}}
+      validate_size: false -> raise "Received packets are too long for the chosen bitrate mode"
+      packet_ready?: false -> {[], %{state | acc: acc}}
     end
   end
 

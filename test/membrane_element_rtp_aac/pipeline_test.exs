@@ -4,30 +4,43 @@ defmodule Membrane.RTP.AAC.Pipeline.Test do
   import Membrane.ChildrenSpec
   import Membrane.Testing.Assertions
 
-  defp prepare_test_payload(_ctx) do
-    %{
-      payload: [<<1>>]
-    }
-  end
+  describe "test payloader to depayloader is identity" do
+    defp create_pipeline_supervised!(frames_per_packet, mode, payload) do
+      spec = [
+        child(:source, %Membrane.Testing.Source{
+          output: payload,
+          stream_format: %Membrane.AAC{}
+        })
+        |> child(:payloader, %Membrane.RTP.AAC.Payloader{mode: mode, frames_per_packet: frames_per_packet})
+        |> child(:depayloader, %Membrane.RTP.AAC.Depayloader{mode: mode})
+        |> child(:sink, Membrane.Testing.Sink)
+      ]
 
-  setup :prepare_test_payload
+      Membrane.Testing.Pipeline.start_link_supervised!(spec: spec)
+    end
 
-  test "payloader to depayloader does not change source", ctx do
-    spec = [
-      child(:source, %Membrane.Testing.Source{output: ctx.payload, stream_format: %Membrane.AAC{}})
-      |> child(:payloader, %Membrane.RTP.AAC.Payloader{mode: :lbr, frames_per_packet: 1})
-      |> child(:depayloader, %Membrane.RTP.AAC.Depayloader{mode: :lbr})
-      |> child(:sink, Membrane.Testing.Sink)
-    ]
+    def run_pipeline_test(frames_per_packet, mode, payload) do
+      pipeline_pid = create_pipeline_supervised!(frames_per_packet, mode, payload)
+      assert_sink_playing(pipeline_pid, :sink)
 
-    pipeline_pid = Membrane.Testing.Pipeline.start_link_supervised!(spec: spec)
+      assert_sink_buffer(pipeline_pid, :sink, %Membrane.Buffer{
+        payload: ^payload
+      })
 
-    assert_start_of_stream(pipeline_pid, :sink)
+      assert_end_of_stream(pipeline_pid, :sink)
+    end
 
-    assert_sink_buffer(pipeline_pid, :sink, %Membrane.Buffer{
-      payload: [<<1::8>>]
-    })
+    test "when sending single packet, low bitrate mode",
+      do: run_pipeline_test(1, :lbr, [<<1>>])
+    test "when sending single packet, high bitrate mode",
+      do: run_pipeline_test(1, :hbr, [<<1>>])
 
-    assert_end_of_stream(pipeline_pid, :sink)
+    test "when sending single packet, multiple frames, low bitrate mode",
+      do: run_pipeline_test(2, :lbr, [<<1>>, <<2>>])
+    test "when sending single packet, multiple frames, high bitrate mode",
+      do: run_pipeline_test(2, :hbr, [<<1>>, <<2>>])
+
+    # test "when sending multiple packets, multiple, frames, low bitrate mode",
+    # TODO: test unhappy paths
   end
 end

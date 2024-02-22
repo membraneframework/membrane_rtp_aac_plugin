@@ -32,8 +32,6 @@ defmodule Membrane.RTP.AAC.Utils do
 
     {au_size_length, au_index_length} = bitrate_params(mode)
 
-    # @type headers :: [{integer(), integer()}]
-    # __jm__ are inline type hints possible?
     headers =
       for <<au_size::size(au_size_length), au_index::size(au_index_length) <- header_section>>,
         do: {au_size, au_index}
@@ -61,12 +59,24 @@ defmodule Membrane.RTP.AAC.Utils do
       end)
 
     case result do
-      {{:ok, aus}, <<>>} -> {:ok, aus}
-      # __jm__ is left more typical?
-      {{:error, reason}, data} -> {:error, {reason, data}}
-      # __jm__ like what?
-      _else -> raise "Unexpected scenario"
+      {{:ok, aus}, <<>>} ->
+        {:ok, aus}
+
+      {{:error, reason}, data} ->
+        {:error, {reason, data}}
+
+      {{:ok, aus}, data} ->
+        {:error, {"Parsing succeeded but did not consume remaining data", aus, data}}
     end
+  end
+
+  @spec validate_max_au_size(mode(), binary()) :: boolean()
+  def validate_max_au_size(mode, au) do
+    import Bitwise
+
+    {size_length, _} = bitrate_params(mode)
+    max_au_size = (1 <<< size_length) - 1
+    byte_size(au) <= max_au_size
   end
 
   @spec validate_deltas([integer()]) :: boolean()
@@ -75,7 +85,6 @@ defmodule Membrane.RTP.AAC.Utils do
 
   @spec validate_sizes([pos_integer()], binary()) :: boolean()
   defp validate_sizes(au_sizes, au_data_section),
-    # __jm__ support interleaving?
     do: Enum.sum(au_sizes) == byte_size(au_data_section)
 
   @spec bitrate_params(mode()) ::

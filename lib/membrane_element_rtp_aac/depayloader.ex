@@ -19,7 +19,6 @@ defmodule Membrane.RTP.AAC.Depayloader do
                 default: 2
               ],
               mode: [
-                # __jm__ idk if this is recognised correctly, can't 'goto' definition
                 spec: Utils.mode()
               ]
 
@@ -28,7 +27,6 @@ defmodule Membrane.RTP.AAC.Depayloader do
     state =
       options
       |> Map.from_struct()
-      |> Map.put(:leftover, <<>>)
 
     {[], state}
   end
