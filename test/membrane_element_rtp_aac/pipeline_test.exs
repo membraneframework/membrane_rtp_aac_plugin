@@ -3,8 +3,10 @@ defmodule Membrane.RTP.AAC.Pipeline.Test do
 
   import Membrane.ChildrenSpec
   import Membrane.Testing.Assertions
+  alias Membrane.RTP.AAC.Utils
 
   describe "test payloader to depayloader is identity" do
+    @spec run_pipeline_test(pos_integer(), Utils.mode(), binary()) :: pid()
     defp create_pipeline_supervised!(frames_per_packet, mode, payload) do
       spec = [
         child(:source, %Membrane.Testing.Source{
@@ -19,7 +21,7 @@ defmodule Membrane.RTP.AAC.Pipeline.Test do
       Membrane.Testing.Pipeline.start_link_supervised!(spec: spec)
     end
 
-    def run_pipeline_test(frames_per_packet, mode, payload) do
+    defp run_pipeline_test(frames_per_packet, mode, payload) do
       pipeline_pid = create_pipeline_supervised!(frames_per_packet, mode, payload)
       assert_sink_playing(pipeline_pid, :sink)
 
