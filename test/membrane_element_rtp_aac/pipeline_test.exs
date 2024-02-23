@@ -1,4 +1,6 @@
 defmodule Membrane.RTP.AAC.Pipeline.Test do
+  @moduledoc false
+
   use ExUnit.Case, async: true
 
   import Membrane.ChildrenSpec

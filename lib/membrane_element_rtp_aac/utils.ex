@@ -1,9 +1,29 @@
 defmodule Membrane.RTP.AAC.Utils do
-  @moduledoc "__jm__"
+  @moduledoc """
+    This module defines helpers for payloading and depayloading non-encapsulated AAC into RTP payloads in accordance with RFC3640
+  """
   use Bunch
 
+  @typedoc """
+    Bitrate mode
+    Supported modes are low bitrate and high bitrate, with the main difference being the limits they impose on access unit size.
+    For more details see validate_max_au_size/2 and bitrate_params/1 defined in this module.
+  """
   @type mode() :: :lbr | :hbr
 
+  @doc """
+    Utility function that constructs an AU header section for a payload with the corresponding AU sizes.
+    From the RFC:
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+- .. -+-+-+-+-+-+-+-+-+-+
+      |AU-headers-length|AU-header|AU-header|      |AU-header|padding|
+      |                 |   (1)   |   (2)   |      |   (n)   | bits  |
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+- .. -+-+-+-+-+-+-+-+-+-+
+    It is important to note that for AAC each individual header is octet aligned, and so padding is not needed.
+    The AU-headers-length is measured in bits, and for AAC defined to be coded using 16 bits.
+    A single header consists of the size of the corresponding frame measured in bytes,
+    followed by an AU-index for the first frame in the payload, and an AU-index-delta otherwise.
+    The AU-index MUST be 0. The delta values need not be 0 in general unless one assumes no interleaving, as is done here.
+  """
   @spec make_headers([pos_integer()], mode()) :: binary()
   def make_headers(sizes, mode) do
     aus_count = length(sizes)
@@ -13,7 +33,6 @@ defmodule Membrane.RTP.AAC.Utils do
     headers_length =
       aus_count * header_length
 
-    # __jm__ support interleaving?
     au_index_deltas = List.duplicate(0, aus_count)
 
     headers =
@@ -25,6 +44,18 @@ defmodule Membrane.RTP.AAC.Utils do
     <<headers_length::16>> <> headers
   end
 
+  @doc """
+    Parses an RTP payload by first parsing the header section and then the frames themselves.
+    For more information about the header size, see make_headers/2 from this module.
+    From the RFC:
+         +---------+-----------+-----------+---------------+
+         | RTP     | AU Header | Auxiliary | Access Unit   |
+         | Header  | Section   | Section   | Data Section  |
+         +---------+-----------+-----------+---------------+
+
+                   <----------RTP Packet Payload----------->
+    For AAC the auxiliary section must always be empty.
+  """
   @spec parse_packet(binary(), any()) :: {:ok, [binary()]} | {:error, any()}
   def parse_packet(packet, mode) do
     <<headers_length::16, header_section::bits-size(headers_length), au_data_section::binary>> =

@@ -1,5 +1,7 @@
 defmodule Membrane.RTP.AAC.Depayloader do
-  @moduledoc "TODO, IETF RFC3640 compliant"
+  @moduledoc "
+    Depayloader for RTP payloads constructed in accordance with RFC3640.
+  "
 
   use Membrane.Filter
   alias Membrane.Buffer

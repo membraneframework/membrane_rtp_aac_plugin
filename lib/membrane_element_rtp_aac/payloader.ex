@@ -1,5 +1,7 @@
 defmodule Membrane.RTP.AAC.Payloader do
-  @moduledoc "TODO, IETF RFC3640 compliant"
+  @moduledoc "
+    Payloader wrapping non-encapsulated AAC frames into RTP payloads in accordance with RFC3640.
+  "
 
   use Membrane.Filter
 
