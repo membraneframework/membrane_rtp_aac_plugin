@@ -72,14 +72,18 @@ defmodule Membrane.RTP.AAC.Utils do
 
     with true <-
            validate_deltas(au_indices)
-           ~>> (false -> {:invalid_deltas, au_indices}),
-         validate_sizes(au_sizes, au_data_section)
-         ~>> (false ->
-                Membrane.Logger.warning(
-                  "Access unit deltas indicate access units are interleaved, but the depayloader does not support it."
-                )),
-         do: parse_data_section(au_sizes, au_data_section),
-         else: (reason -> {:error, {"Validation failed:", reason}})
+           ~>> (false -> {:invalid_deltas, au_indices}) do
+      _ =
+        if not validate_sizes(au_sizes, au_data_section) do
+          Membrane.Logger.warning(
+            "Access unit deltas indicate access units are interleaved, but the depayloader does not support it."
+          )
+        end
+
+      parse_data_section(au_sizes, au_data_section)
+    else
+      reason -> {:error, {"Validation failed:", reason}}
+    end
   end
 
   @spec parse_data_section([pos_integer()], binary()) :: {:ok, [binary()]} | {:error, any()}
