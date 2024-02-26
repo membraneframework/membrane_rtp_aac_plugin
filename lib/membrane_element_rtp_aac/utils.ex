@@ -3,6 +3,7 @@ defmodule Membrane.RTP.AAC.Utils do
     This module defines helpers for payloading and depayloading non-encapsulated AAC into RTP payloads in accordance with RFC3640
   """
   use Bunch
+  require Membrane.Logger
 
   @typedoc """
     Bitrate mode
@@ -72,9 +73,11 @@ defmodule Membrane.RTP.AAC.Utils do
     with true <-
            validate_deltas(au_indices)
            ~>> (false -> {:invalid_deltas, au_indices}),
-         true <-
-           validate_sizes(au_sizes, au_data_section)
-           ~>> (false -> {:inconsistent_sizes, au_sizes, au_data_section}),
+         validate_sizes(au_sizes, au_data_section)
+         ~>> (false ->
+                Membrane.Logger.warning(
+                  "Access unit deltas indicate access units are interleaved, but the depayloader does not support it."
+                )),
          do: parse_data_section(au_sizes, au_data_section),
          else: (reason -> {:error, {"Validation failed:", reason}})
   end
