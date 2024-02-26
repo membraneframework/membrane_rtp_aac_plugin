@@ -73,7 +73,7 @@ defmodule Membrane.RTP.AAC.Utils do
     with true <-
            validate_deltas(au_indices)
            ~>> (false -> {:invalid_deltas, au_indices}) do
-      _ =
+      _warning =
         if not validate_sizes(au_sizes, au_data_section) do
           Membrane.Logger.warning(
             "Access unit deltas indicate access units are interleaved, but the depayloader does not support it."
