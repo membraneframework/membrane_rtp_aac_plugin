@@ -1,9 +1,10 @@
 defmodule Membrane.RTP.AAC.Payloader do
-  @moduledoc "
+  @moduledoc """
     Payloader wrapping non-encapsulated AAC frames into RTP payloads in accordance with RFC3640.
-  "
+  """
 
   use Membrane.Filter
+  use Bunch
 
   alias Membrane.Buffer
   alias Membrane.{AAC, RTP}
@@ -36,17 +37,15 @@ defmodule Membrane.RTP.AAC.Payloader do
 
   @impl true
   def handle_buffer(:input, buffer, _ctx, state) do
-    use Bunch
-
-    Bunch.withl do: au = buffer.payload,
-                validate_size: true <- Utils.validate_max_au_size(state.mode, au),
-                do: acc = [au | state.acc],
-                packet_ready?: true <- length(acc) == state.frames_per_packet,
-                do: acc = acc |> Enum.reverse(),
-                do: new_buffer = %Buffer{buffer | payload: wrap_aac(acc, state)} do
+    withl do: au = buffer.payload,
+          validate_size: true <- Utils.validate_max_au_size(state.mode, au),
+          do: acc = [au | state.acc],
+          packet_ready?: true <- length(acc) == state.frames_per_packet do
+      acc = Enum.reverse(acc)
+      new_buffer = %Buffer{buffer | payload: wrap_aac(acc, state)}
       {[buffer: {:output, new_buffer}], %{state | acc: []}}
     else
-      validate_size: false -> raise "Received packets are too long for the chosen bitrate mode"
+      validate_size: false -> raise "Received frames are too long for the chosen bitrate mode"
       packet_ready?: false -> {[], %{state | acc: acc}}
     end
   end
