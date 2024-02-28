@@ -6,7 +6,7 @@ defmodule Membrane.RTP.AAC.Pipeline.Test do
   import Membrane.ChildrenSpec
   import Membrane.Testing.Assertions
 
-  describe "test payloader to depayloader is identity" do
+  describe "payloader to depayloader is identity" do
     defp get_pipeline_spec(frames_per_packet, mode, payload) do
       child(:source, %Membrane.Testing.Source{
         output: payload,
