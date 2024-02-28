@@ -1,7 +1,7 @@
 defmodule Membrane.RTP.AAC.Depayloader do
-  @moduledoc "
+  @moduledoc """
     Depayloader for RTP payloads constructed in accordance with RFC3640.
-  "
+  """
 
   use Membrane.Filter
   alias Membrane.Buffer
@@ -11,17 +11,11 @@ defmodule Membrane.RTP.AAC.Depayloader do
   def_input_pad :input, accepted_format: %RTP{}
   def_output_pad :output, accepted_format: %AAC{encapsulation: :none}
 
-  def_options profile: [
-                default: :LC
-              ],
-              sample_rate: [
-                default: 44_100
-              ],
-              channels: [
-                default: 2
-              ],
-              mode: [
-                spec: Utils.mode()
+  def_options mode: [
+                spec: Utils.mode(),
+                description: """
+                The bitrate mode that dictates the maximum length of a single frame. For more information refer to Utils.mode()'s typedoc.
+                """
               ]
 
   @impl true
@@ -35,13 +29,7 @@ defmodule Membrane.RTP.AAC.Depayloader do
 
   @impl true
   def handle_stream_format(:input, _stream_fmt, _ctx, state) do
-    stream_fmt = %AAC{
-      profile: state.profile,
-      sample_rate: state.sample_rate,
-      channels: state.channels
-    }
-
-    {[stream_format: {:output, stream_fmt}], state}
+    {[stream_format: {:output, %AAC{}}], state}
   end
 
   @impl true

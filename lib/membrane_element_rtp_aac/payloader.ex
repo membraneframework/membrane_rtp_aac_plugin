@@ -14,10 +14,17 @@ defmodule Membrane.RTP.AAC.Payloader do
   def_output_pad :output, accepted_format: %RTP{}
 
   def_options mode: [
-                spec: Utils.mode()
+                spec: Utils.mode(),
+                description: """
+                The bitrate mode that dictates the maximum length of a single frame. For more information refer to Utils.mode()'s typedoc.
+                """
               ],
               frames_per_packet: [
-                spec: pos_integer()
+                spec: pos_integer(),
+                description: """
+                Fixed number of AAC frames the payloader can send in a single packet.
+                The payloader will not send a packet until the number of frames is equal to this value.
+                """
               ]
 
   @impl true
