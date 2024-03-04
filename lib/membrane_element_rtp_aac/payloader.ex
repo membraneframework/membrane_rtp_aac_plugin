@@ -16,7 +16,7 @@ defmodule Membrane.RTP.AAC.Payloader do
   def_options mode: [
                 spec: Utils.mode(),
                 description: """
-                The bitrate mode that dictates the maximum length of a single frame. For more information refer to Utils.mode()'s typedoc.
+                The bitrate mode that dictates the maximum length of a single frame. For more information refer to typedoc of `Membrane.RTP.AAC.Utils.mode()`.
                 """
               ],
               frames_per_packet: [
