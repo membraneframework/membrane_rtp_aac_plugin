@@ -1,14 +1,14 @@
 defmodule Membrane.Template.Mixfile do
   use Mix.Project
 
-  @version "1.0.0"
+  @version "0.9.0"
   @github_url "https://github.com/membraneframework/membrane_rtp_aac_plugin"
 
   def project do
     [
       app: :membrane_rtp_aac_plugin,
       version: @version,
-      elixir: "~> 1.15",
+      elixir: "~> 1.12",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
