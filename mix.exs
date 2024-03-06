@@ -8,7 +8,7 @@ defmodule Membrane.Template.Mixfile do
     [
       app: :membrane_rtp_aac_plugin,
       version: @version,
-      elixir: "~> 1.16",
+      elixir: "~> 1.15",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
