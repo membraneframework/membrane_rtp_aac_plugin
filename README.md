@@ -4,7 +4,7 @@
 [![API Docs](https://img.shields.io/badge/api-docs-yellow.svg?style=flat)](https://hexdocs.pm/membrane_rtp_aac_plugin)
 [![CircleCI](https://circleci.com/gh/membraneframework-labs/membrane_rtp_aac_plugin.svg?style=svg)](https://circleci.com/gh/membraneframework-labs/membrane_rtp_aac_plugin)
 
-This package provides elements that can be used for depayloading AAC audio.
+This package provides elements that can be used for payloading and depayloading AAC audio in accordance with [RFC3640](https://datatracker.ietf.org/doc/html/rfc3640), using the mpeg4-generic payloading scheme.
 
 It is part of [Membrane Multimedia Framework](https://membrane.stream).
 
@@ -15,7 +15,7 @@ The package can be installed by adding `membrane_rtp_aac_plugin` to your list of
 ```elixir
 def deps do
   [
-    {:membrane_rtp_aac_plugin, "~> 0.8.0"}
+    {:membrane_rtp_aac_plugin, "~> 0.9.0"}
   ]
 end
 ```
