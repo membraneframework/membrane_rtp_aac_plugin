@@ -7,9 +7,9 @@ defmodule Membrane.RTP.AAC.Pipeline.Test do
   import Membrane.Testing.Assertions
 
   describe "payloader to depayloader is identity" do
-    defp get_pipeline_spec(frames_per_packet, mode, payload) do
+    defp get_pipeline_spec(frames_per_packet, mode, payloads) do
       child(:source, %Membrane.Testing.Source{
-        output: payload,
+        output: payloads,
         stream_format: %Membrane.AAC{}
       })
       |> child(:payloader, %Membrane.RTP.AAC.Payloader{
@@ -20,26 +20,29 @@ defmodule Membrane.RTP.AAC.Pipeline.Test do
       |> child(:sink, Membrane.Testing.Sink)
     end
 
-    defp run_pipeline_expect_success(frames_per_packet, mode, payload) do
+    defp run_pipeline_expect_success(frames_per_packet, mode, payloads) do
       pipeline_pid =
         Membrane.Testing.Pipeline.start_link_supervised!(
-          spec: get_pipeline_spec(frames_per_packet, mode, payload)
+          spec: get_pipeline_spec(frames_per_packet, mode, payloads)
         )
 
       assert_sink_playing(pipeline_pid, :sink)
 
-      assert_sink_buffer(pipeline_pid, :sink, %Membrane.Buffer{
-        payload: ^payload
-      })
+      Enum.each(
+        payloads,
+        &assert_sink_buffer(pipeline_pid, :sink, %Membrane.Buffer{payload: ^&1})
+      )
 
       assert_end_of_stream(pipeline_pid, :sink)
       Membrane.Pipeline.terminate(pipeline_pid)
     end
 
-    defp run_pipeline_expect_frames_too_long(frames_per_packet, mode, payload) do
+    defp run_pipeline_expect_frames_too_long(frames_per_packet, mode, payloads) do
       # NOTE: must start pipeline unsupervised to capture logs correctly
       {:ok, _supervisor_pid, pipeline_pid} =
-        Membrane.Testing.Pipeline.start(spec: get_pipeline_spec(frames_per_packet, mode, payload))
+        Membrane.Testing.Pipeline.start(
+          spec: get_pipeline_spec(frames_per_packet, mode, payloads)
+        )
 
       assert_sink_playing(pipeline_pid, :sink)
       pipeline_ref = Process.monitor(pipeline_pid)
