@@ -34,8 +34,9 @@ defmodule Membrane.RTP.AAC.Depayloader do
 
   @impl true
   def handle_buffer(:input, buffer, _ctx, state) do
-    with {:ok, payload} <- Utils.parse_packet(buffer.payload, state.mode) do
-      {[buffer: {:output, %Buffer{buffer | payload: payload}}], state}
+    with {:ok, payloads} <- Utils.parse_packet(buffer.payload, state.mode) do
+      buffers = Enum.map(payloads, &%Buffer{buffer | payload: &1})
+      {[buffer: {:output, buffers}], state}
     else
       {:error, reason} -> raise "Cannot parse packet due to: #{inspect(reason)}"
     end
