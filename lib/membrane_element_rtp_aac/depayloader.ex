@@ -16,6 +16,24 @@ defmodule Membrane.RTP.AAC.Depayloader do
                 description: """
                 The bitrate mode that dictates the maximum length of a single frame. For more information refer to typedoc of `Membrane.RTP.AAC.Utils.mode()`.
                 """
+              ],
+              au_size_length: [
+                spec: non_neg_integer(),
+                default: :mode_default,
+                description: """
+                The number of bits on which the AU-size field is encoded in the AU-header. Defaults are: 
+                  - for high bit-rate mode - 13
+                  - for low bit-rate mode - 6
+                """
+              ],
+              au_index_length: [
+                spec: non_neg_integer(),
+                default: :mode_default,
+                description: """
+                The number of bits on which the AU-index field is encoded in the AU-header. Defaults are: 
+                  - for high bit-rate mode - 3 
+                  - for low bit-rate mode - 2
+                """
               ]
 
   @impl true

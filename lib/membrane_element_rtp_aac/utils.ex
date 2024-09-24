@@ -58,7 +58,7 @@ defmodule Membrane.RTP.AAC.Utils do
                    <----------RTP Packet Payload----------->
     For AAC the auxiliary section must always be empty.
   """
-  @spec parse_packet(binary(), any()) :: {:ok, [binary()]} | {:error, any()}
+  @spec parse_packet(binary(), mode()) :: {:ok, [binary()]} | {:error, any()}
   def parse_packet(packet, mode) do
     <<headers_length::16, header_section::bits-size(headers_length), au_data_section::binary>> =
       packet
