@@ -8,7 +8,8 @@ defmodule Membrane.RTP.AAC.Plugin.App do
     PayloadFormat.register(%PayloadFormat{
       encoding_name: :AAC,
       payload_type: 127,
-      depayloader: AAC.Depayloader
+      depayloader: AAC.Depayloader,
+      payloader: AAC.Payloader
     })
 
     PayloadFormat.register_payload_type_mapping(127, :AAC, 48_000)
