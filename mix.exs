@@ -1,7 +1,7 @@
 defmodule Membrane.Template.Mixfile do
   use Mix.Project
 
-  @version "0.9.3"
+  @version "0.9.4"
   @github_url "https://github.com/membraneframework/membrane_rtp_aac_plugin"
 
   def project do
@@ -40,7 +40,7 @@ defmodule Membrane.Template.Mixfile do
     [
       {:membrane_core, "~> 1.0"},
       {:membrane_aac_format, "~> 0.8.0"},
-      {:membrane_rtp_format, "~> 0.9.0"},
+      {:membrane_rtp_format, "~> 0.10.0"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:dialyxir, ">= 0.0.0", only: :dev, runtime: false},
       {:credo, ">= 0.0.0", only: :dev, runtime: false}
