@@ -1,4 +1,4 @@
-defmodule Membrane.Template.Mixfile do
+defmodule Membrane.RTP.AAC.Mixfile do
   use Mix.Project
 
   @version "0.9.4"
