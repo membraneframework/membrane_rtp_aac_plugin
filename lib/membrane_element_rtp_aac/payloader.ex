@@ -11,7 +11,7 @@ defmodule Membrane.RTP.AAC.Payloader do
   alias Membrane.RTP.AAC.Utils
 
   def_input_pad :input, accepted_format: %AAC{encapsulation: :none}
-  def_output_pad :output, accepted_format: %RTP{}
+  def_output_pad :output, accepted_format: %RTP{payload_format: AAC}
 
   def_options mode: [
                 spec: Utils.mode(),
@@ -39,7 +39,7 @@ defmodule Membrane.RTP.AAC.Payloader do
 
   @impl true
   def handle_stream_format(:input, _stream_fmt, _ctx, state) do
-    {[stream_format: {:output, %RTP{}}], state}
+    {[stream_format: {:output, %RTP{payload_format: AAC}}], state}
   end
 
   @impl true

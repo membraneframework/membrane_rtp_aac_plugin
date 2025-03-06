@@ -8,7 +8,7 @@ defmodule Membrane.RTP.AAC.Depayloader do
   alias Membrane.{AAC, RTP}
   alias Membrane.RTP.AAC.Utils
 
-  def_input_pad :input, accepted_format: %RTP{}
+  def_input_pad :input, accepted_format: %RTP{payload_format: format} when format in [nil, AAC]
   def_output_pad :output, accepted_format: %AAC{encapsulation: :none}
 
   def_options mode: [
