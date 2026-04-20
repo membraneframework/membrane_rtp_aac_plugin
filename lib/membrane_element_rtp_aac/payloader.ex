@@ -6,7 +6,6 @@ defmodule Membrane.RTP.AAC.Payloader do
   use Membrane.Filter
   use Bunch
 
-  alias Membrane.Buffer
   alias Membrane.{AAC, RTP}
   alias Membrane.RTP.AAC.Utils
 
@@ -49,7 +48,7 @@ defmodule Membrane.RTP.AAC.Payloader do
           do: acc = [au | state.acc],
           packet_ready?: true <- length(acc) == state.frames_per_packet do
       acc = Enum.reverse(acc)
-      new_buffer = %Buffer{buffer | payload: wrap_aac(acc, state)}
+      new_buffer = %{buffer | payload: wrap_aac(acc, state)}
       {[buffer: {:output, new_buffer}], %{state | acc: []}}
     else
       validate_size: false -> raise "Received frames are too long for the chosen bitrate mode"
