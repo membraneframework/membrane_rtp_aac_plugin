@@ -113,7 +113,7 @@ defmodule Membrane.RTP.AAC.Utils do
   def validate_max_au_size(mode, au) do
     import Bitwise
 
-    {size_length, _x} = bitrate_params(mode)
+    {size_length, _index_length} = bitrate_params(mode)
     max_au_size = (1 <<< size_length) - 1
     byte_size(au) <= max_au_size
   end
