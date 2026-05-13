@@ -4,8 +4,7 @@ defmodule Membrane.RTP.AAC.Depayloader do
   """
 
   use Membrane.Filter
-  alias Membrane.Buffer
-  alias Membrane.{AAC, RTP}
+  alias Membrane.{AAC, Buffer, RTP}
   alias Membrane.RTP.AAC.Utils
 
   def_input_pad :input, accepted_format: %RTP{payload_format: format} when format in [nil, AAC]
@@ -33,7 +32,7 @@ defmodule Membrane.RTP.AAC.Depayloader do
   end
 
   @impl true
-  def handle_buffer(:input, buffer, _ctx, state) do
+  def handle_buffer(:input, %Buffer{} = buffer, _ctx, state) do
     with {:ok, payloads} <- Utils.parse_packet(buffer.payload, state.mode) do
       buffers = Enum.map(payloads, &%Buffer{buffer | payload: &1})
       {[buffer: {:output, buffers}], state}

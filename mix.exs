@@ -1,7 +1,7 @@
 defmodule Membrane.RTP.AAC.Mixfile do
   use Mix.Project
 
-  @version "0.9.5"
+  @version "0.9.6"
   @github_url "https://github.com/membraneframework/membrane_rtp_aac_plugin"
 
   def project do
@@ -54,6 +54,7 @@ defmodule Membrane.RTP.AAC.Mixfile do
 
     if System.get_env("CI") == "true" do
       # Store PLTs in cacheable directory for CI
+      File.mkdir_p!(Path.join([__DIR__, "priv", "plts"]))
       [plt_local_path: "priv/plts", plt_core_path: "priv/plts"] ++ opts
     else
       opts

@@ -6,8 +6,7 @@ defmodule Membrane.RTP.AAC.Payloader do
   use Membrane.Filter
   use Bunch
 
-  alias Membrane.Buffer
-  alias Membrane.{AAC, RTP}
+  alias Membrane.{AAC, Buffer, RTP}
   alias Membrane.RTP.AAC.Utils
 
   def_input_pad :input, accepted_format: %AAC{encapsulation: :none}
@@ -43,7 +42,7 @@ defmodule Membrane.RTP.AAC.Payloader do
   end
 
   @impl true
-  def handle_buffer(:input, buffer, _ctx, state) do
+  def handle_buffer(:input, %Buffer{} = buffer, _ctx, state) do
     withl do: au = buffer.payload,
           validate_size: true <- Utils.validate_max_au_size(state.mode, au),
           do: acc = [au | state.acc],
