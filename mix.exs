@@ -1,7 +1,7 @@
 defmodule Membrane.RTP.AAC.Mixfile do
   use Mix.Project
 
-  @version "0.9.7"
+  @version "0.9.8"
   @github_url "https://github.com/membraneframework/membrane_rtp_aac_plugin"
 
   def project do
@@ -22,7 +22,8 @@ defmodule Membrane.RTP.AAC.Mixfile do
       name: "Membrane RTP AAC Plugin",
       source_url: @github_url,
       homepage_url: "https://membrane.stream",
-      docs: docs()
+      docs: docs(),
+      aliases: [docs: ["docs", &append_llms_links/1]]
     ]
   end
 
@@ -41,7 +42,7 @@ defmodule Membrane.RTP.AAC.Mixfile do
       {:membrane_core, "~> 1.0"},
       {:membrane_aac_format, "~> 0.8.0"},
       {:membrane_rtp_format, "~> 0.11.0"},
-      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:ex_doc, ">= 0.40.0", only: :dev, runtime: false},
       {:dialyxir, ">= 0.0.0", only: :dev, runtime: false},
       {:credo, ">= 0.0.0", only: :dev, runtime: false}
     ]
@@ -76,9 +77,30 @@ defmodule Membrane.RTP.AAC.Mixfile do
     [
       main: "readme",
       extras: ["README.md", "LICENSE"],
-      formatters: ["html"],
       source_ref: "v#{@version}",
       nest_modules_by_prefix: [Membrane.RTP.AAC]
     ]
+  end
+
+  defp append_llms_links(_args) do
+    output_dir = docs()[:output] || "doc"
+    path = Path.join(output_dir, "llms.txt")
+
+    if File.exists?(path) do
+      existing = File.read!(path)
+
+      footer = """
+
+
+      ## See Also
+
+      - [Membrane Framework AI Skill](https://hexdocs.pm/membrane_core/skill.md)
+      - [Membrane Core](https://hexdocs.pm/membrane_core/llms.txt)
+      """
+
+      File.write!(path, String.trim_trailing(existing) <> footer)
+    else
+      IO.warn("#{path} not found — llms.txt was not generated, check your ex_doc configuration")
+    end
   end
 end
