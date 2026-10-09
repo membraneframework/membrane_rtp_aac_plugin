@@ -66,7 +66,7 @@ defmodule Membrane.RTP.AAC.Utils do
     {au_size_length, au_index_length} = bitrate_params(mode)
 
     headers =
-      for <<au_size::size(au_size_length), au_index::size(au_index_length) <- header_section>>,
+      for <<au_size::size(^au_size_length), au_index::size(^au_index_length) <- header_section>>,
         do: {au_size, au_index}
 
     {au_sizes, au_indices} = headers |> Enum.unzip()
@@ -92,7 +92,7 @@ defmodule Membrane.RTP.AAC.Utils do
     result =
       Bunch.Enum.try_map_reduce(au_sizes, au_data_section, fn len, data ->
         case data do
-          <<au::binary-size(len), rest::binary>> -> {{:ok, au}, rest}
+          <<au::binary-size(^len), rest::binary>> -> {{:ok, au}, rest}
           _else -> {{:error, "Couldn't consume remaining data"}, data}
         end
       end)
