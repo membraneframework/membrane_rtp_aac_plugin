@@ -16,7 +16,7 @@ The package can be installed by adding `membrane_rtp_aac_plugin` to your list of
 ```elixir
 def deps do
   [
-    {:membrane_rtp_aac_plugin, "~> 0.9.8"}
+    {:membrane_rtp_aac_plugin, "~> 0.9.9"}
   ]
 end
 ```
