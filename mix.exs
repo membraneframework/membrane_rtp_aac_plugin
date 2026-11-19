@@ -1,7 +1,7 @@
 defmodule Membrane.RTP.AAC.Mixfile do
   use Mix.Project
 
-  @version "0.9.8"
+  @version "0.9.9"
   @github_url "https://github.com/membraneframework/membrane_rtp_aac_plugin"
 
   def project do
