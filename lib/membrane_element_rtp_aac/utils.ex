@@ -59,10 +59,11 @@ defmodule Membrane.RTP.AAC.Utils do
     For AAC the auxiliary section must always be empty.
   """
   @spec parse_packet(binary(), any()) :: {:ok, [binary()]} | {:error, any()}
-  def parse_packet(packet, mode) do
-    <<headers_length::16, header_section::bits-size(headers_length), au_data_section::binary>> =
-      packet
-
+  def parse_packet(
+        <<headers_length::16, header_section::bits-size(headers_length),
+          au_data_section::binary>>,
+        mode
+      ) do
     {au_size_length, au_index_length} = bitrate_params(mode)
 
     headers =
@@ -85,6 +86,10 @@ defmodule Membrane.RTP.AAC.Utils do
     else
       reason -> {:error, {"Validation failed:", reason}}
     end
+  end
+
+  def parse_packet(packet, _mode) do
+    {:error, {"Packet too short for the AU header section it declares:", packet}}
   end
 
   @spec parse_data_section([pos_integer()], binary()) :: {:ok, [binary()]} | {:error, any()}

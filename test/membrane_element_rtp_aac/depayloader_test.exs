@@ -16,61 +16,77 @@ defmodule Membrane.RTP.AAC.Depayloader.Test do
       |> child(:sink, Membrane.Testing.Sink)
     end
 
-    defp run_test_inconsistent_sizes(frame, invalid_frame_size) do
-      mode = :lbr
-      header = <<invalid_frame_size::6, 0::2>>
-      packet = <<bit_size(header)::16, header::binary, frame::binary>>
+    defp assert_dropped(malformed_packet) do
+      frame = <<1::8, 2::8>>
+      header = <<byte_size(frame)::6, 0::2>>
+      valid_packet = <<bit_size(header)::16, header::binary, frame::binary>>
 
-      {:ok, _supervisor_pid, pipeline_pid} =
-        Membrane.Testing.Pipeline.start(spec: get_pipeline_spec(mode, [packet]))
+      pipeline =
+        Membrane.Testing.Pipeline.start_link_supervised!(
+          spec: get_pipeline_spec(:lbr, [malformed_packet, valid_packet])
+        )
 
-      assert_sink_playing(pipeline_pid, :sink)
-      pipeline_ref = Process.monitor(pipeline_pid)
-
-      assert_receive(
-        {:DOWN, ^pipeline_ref, :process, ^pipeline_pid,
-         {:membrane_child_crash, :depayloader,
-          {%RuntimeError{
-             message: reason
-           }, _}}},
-        2000
-      )
-
-      assert String.match?(reason, ~r/:inconsistent_sizes/)
+      assert_sink_buffer(pipeline, :sink, %Membrane.Buffer{payload: ^frame})
+      assert_end_of_stream(pipeline, :sink)
+      refute_sink_buffer(pipeline, :sink, _buffer, 0)
+      Membrane.Testing.Pipeline.terminate(pipeline)
     end
 
-    defp run_test_invalid_headers_length(frame, invalid_headers_length) do
-      mode = :lbr
+    test "drops a packet with an invalid frame size" do
+      frame = <<1::8, 2::8>>
+
+      for invalid_frame_size <- [0, 1, 55, -2] do
+        header = <<invalid_frame_size::6, 0::2>>
+        assert_dropped(<<bit_size(header)::16, header::binary, frame::binary>>)
+      end
+    end
+
+    test "drops a packet with an invalid header length" do
+      frame = <<1::8, 2::8>>
       header = <<bit_size(frame)::6, 0::2>>
-      packet = <<invalid_headers_length::16, header::binary, frame::binary>>
 
-      {:ok, _supervisor_pid, pipeline_pid} =
-        Membrane.Testing.Pipeline.start(spec: get_pipeline_spec(mode, [packet]))
-
-      assert_sink_playing(pipeline_pid, :sink)
-      pipeline_ref = Process.monitor(pipeline_pid)
-
-      assert_receive(
-        {:DOWN, ^pipeline_ref, :process, ^pipeline_pid,
-         {:membrane_child_crash, :depayloader, _reason}},
-        2000
-      )
+      for invalid_headers_length <- [-2, 0, 4, 12] do
+        assert_dropped(<<invalid_headers_length::16, header::binary, frame::binary>>)
+      end
     end
 
-    test "when sending single packet with invalid frame size" do
-      frame = <<1::8, 2::8>>
-      run_test_inconsistent_sizes(frame, 0)
-      run_test_inconsistent_sizes(frame, 1)
-      run_test_inconsistent_sizes(frame, 55)
-      run_test_inconsistent_sizes(frame, -2)
-    end
+    test "drops packets it cannot parse, logs them and carries on" do
+      import ExUnit.CaptureLog
 
-    test "when sending single packet with invalid header length" do
       frame = <<1::8, 2::8>>
-      run_test_invalid_headers_length(frame, -2)
-      run_test_invalid_headers_length(frame, 0)
-      run_test_invalid_headers_length(frame, 4)
-      run_test_invalid_headers_length(frame, 12)
+      header = <<byte_size(frame)::6, 0::2>>
+      valid = <<bit_size(header)::16, header::binary, frame::binary>>
+
+      malformed = [
+        # no room for the AU headers length
+        <<1>>,
+        # AU headers length larger than the packet
+        <<4000::16, header::binary, frame::binary>>,
+        # the AU size disagrees with the data that follows
+        <<bit_size(header)::16, 55::6, 0::2, frame::binary>>,
+        <<>>
+      ]
+
+      spec =
+        child(:source, %Membrane.Testing.Source{
+          output: [valid] ++ malformed ++ [valid],
+          stream_format: %Membrane.RTP{}
+        })
+        |> child(:depayloader, %Membrane.RTP.AAC.Depayloader{mode: :lbr})
+        |> child(:sink, Membrane.Testing.Sink)
+
+      log =
+        capture_log(fn ->
+          pipeline = Membrane.Testing.Pipeline.start_link_supervised!(spec: spec)
+
+          assert_sink_buffer(pipeline, :sink, %Membrane.Buffer{payload: ^frame})
+          assert_sink_buffer(pipeline, :sink, %Membrane.Buffer{payload: ^frame})
+          assert_end_of_stream(pipeline, :sink)
+          refute_sink_buffer(pipeline, :sink, _buffer, 0)
+          Membrane.Testing.Pipeline.terminate(pipeline)
+        end)
+
+      assert log =~ "Dropping an RTP packet"
     end
   end
 end
