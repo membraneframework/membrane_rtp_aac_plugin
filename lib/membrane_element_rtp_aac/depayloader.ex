@@ -4,6 +4,9 @@ defmodule Membrane.RTP.AAC.Depayloader do
   """
 
   use Membrane.Filter
+
+  require Membrane.Logger
+
   alias Membrane.{AAC, Buffer, RTP}
   alias Membrane.RTP.AAC.Utils
 
@@ -19,11 +22,7 @@ defmodule Membrane.RTP.AAC.Depayloader do
 
   @impl true
   def handle_init(_ctx, options) do
-    state =
-      options
-      |> Map.from_struct()
-
-    {[], state}
+    {[], %{mode: options.mode, malformed_packet_logged?: false}}
   end
 
   @impl true
@@ -37,7 +36,25 @@ defmodule Membrane.RTP.AAC.Depayloader do
       buffers = Enum.map(payloads, &%Buffer{buffer | payload: &1})
       {[buffer: {:output, buffers}], state}
     else
-      {:error, reason} -> raise "Cannot parse packet due to: #{inspect(reason)}"
+      {:error, reason} ->
+        {[], log_dropped_packet(reason, state)}
     end
+  end
+
+  defp log_dropped_packet(reason, %{malformed_packet_logged?: true} = state) do
+    Membrane.Logger.debug(
+      "Dropping an RTP packet that cannot be parsed due to: #{inspect(reason)}"
+    )
+
+    state
+  end
+
+  defp log_dropped_packet(reason, state) do
+    Membrane.Logger.warning("""
+    Dropping an RTP packet that cannot be parsed due to: #{inspect(reason)}. \
+    Further ones will be logged at the debug level.
+    """)
+
+    %{state | malformed_packet_logged?: true}
   end
 end
